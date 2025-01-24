@@ -31,14 +31,19 @@ const Reports = ({ bundles }) => {
             </tr>
           </thead>
           <tbody>
-            {bundles.map((bundle, index) => (
-              <tr key={index}>
-                <td className="border p-2">{bundle.supplier}</td>
-                <td className="border p-2">{bundle.quantity}</td>
-                <td className="border p-2">${bundle.cost}</td>
-                <td className="border p-2">{bundle.receivedAt}</td>
-              </tr>
-            ))}
+            {bundles.map((bundle, index) => {
+              const date = new Date(bundle.receivedAt).toLocaleDateString(
+                "en-GB"
+              );
+              return (
+                <tr key={index}>
+                  <td className="border p-2">{bundle.supplier}</td>
+                  <td className="border p-2">{bundle.quantity}</td>
+                  <td className="border p-2">PKR{bundle.cost}</td>
+                  <td className="custom-cell">{date}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

@@ -1,11 +1,17 @@
+import axios from "axios";
 import React, { useState } from "react";
+import MyModal from "../Component/MyModal";
+import Button from "../Component/Button";
 
 const AddBundle = ({ onAddBundle }) => {
+  let [isOpen, setIsOpen] = useState(false);
+
   const [formData, setFormData] = useState({
     supplier: "",
     quantity: "",
     cost: "",
     receivedAt: "",
+    image: "",
   });
 
   const handleChange = (e) => {
@@ -13,10 +19,28 @@ const AddBundle = ({ onAddBundle }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     onAddBundle(formData);
-    setFormData({ supplier: "", quantity: "", cost: "", receivedAt: "" });
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3333/api/bundles",
+        formData
+      );
+      console.log("Bundle added:", response.data);
+      // Optionally, reset the form or provide feedback to the user
+    } catch (err) {
+      console.error("Failed to add bundle", err);
+    }
+    setIsOpen(true);
+    setFormData({
+      supplier: "",
+      quantity: "",
+      cost: "",
+      receivedAt: "",
+      // image: "",
+    });
   };
 
   return (
@@ -67,13 +91,9 @@ const AddBundle = ({ onAddBundle }) => {
             required
           />
         </div>
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          Add Bundle
-        </button>
+        <Button type={"submit"} title={"Add Bundle"} />
       </form>
+      <MyModal isOpen={isOpen} setIsOpen={setIsOpen} />
     </div>
   );
 };

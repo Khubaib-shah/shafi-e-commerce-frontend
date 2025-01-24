@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -10,4 +11,16 @@ body {
 .container {
   max-width: 800px;
   margin: 0 auto;
+}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .custom-cell {
+    @apply border-2 text-start text-xs p-1 md:text-base md:p-2 lg:text-lg lg:p-3;
+  }
+  .link {
+    @apply text-red-500 font-[400] hover:text-red-600 active:text-blue-500;
+  }
 }
