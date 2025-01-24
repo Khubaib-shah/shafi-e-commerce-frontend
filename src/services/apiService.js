@@ -11,7 +11,7 @@ const apiClient = axios.create({
 
 export const getItems = async () => {
   try {
-    const { data } = await apiClient.get("/bundles");
+    const { data } = await apiClient.get("/api/bundles");
     return data;
   } catch (error) {
     console.error("Error fetching items:", error);
@@ -21,7 +21,7 @@ export const getItems = async () => {
 
 export const createItem = async (itemData) => {
   try {
-    const response = await apiClient.post("/bundles", itemData);
+    const response = await apiClient.post("/api/bundles", itemData);
     return response.data;
   } catch (error) {
     console.error("Error creating item:", error);

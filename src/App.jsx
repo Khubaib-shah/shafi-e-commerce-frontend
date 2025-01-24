@@ -5,7 +5,6 @@ import Navbar from "./components/Navbar";
 import AddBundle from "./pages/AddBundle";
 import Inventory from "./pages/InventoryTable";
 import Reports from "./pages/Reports";
-import "./App.css";
 import { Toaster } from "sonner";
 
 const App = () => {

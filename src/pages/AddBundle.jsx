@@ -6,33 +6,59 @@ import { toast } from "sonner";
 import { createItem } from "@/services/apiService";
 import { Button } from "@/components/ui/Button";
 
-const AddBundle = ({ onAddBundle }) => {
+const AddBundle = () => {
   const [formData, setFormData] = useState({
     supplier: "",
     quantity: "",
     cost: "",
     receivedAt: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isYes, setIsYes] = useState();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  const validateForm = () => {
+    const { supplier, quantity, cost, receivedAt } = formData;
+    if (!supplier || !quantity || !cost || !receivedAt) {
+      toast.error("All fields are required.");
+      return false;
+    }
+    if (quantity <= 0 || cost <= 0) {
+      toast.error("Quantity and Cost must be positive numbers.");
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
     try {
-      const data = await createItem(formData);
-      onAddBundle(data);
-      toast("New Bundle created.");
-      setFormData({
-        supplier: "",
-        quantity: "",
-        cost: "",
-        receivedAt: "",
-      });
+      await createItem(formData);
+      toast.success("New Bundle created.");
+      if (
+        window.confirm(
+          "Form submitted successfully. Do you want to reset the form?"
+        )
+      ) {
+        setFormData({
+          supplier: "",
+          quantity: "",
+          cost: "",
+          receivedAt: "",
+        });
+      }
     } catch (err) {
+      toast.error("Failed to add bundle. Please try again.");
       console.error("Failed to add bundle", err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -87,8 +113,8 @@ const AddBundle = ({ onAddBundle }) => {
               required
             />
           </div>
-          <Button type="submit" className="w-full">
-            Add Bundle
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Add Bundle"}
           </Button>
         </form>
       </CardContent>

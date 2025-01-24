@@ -22,7 +22,6 @@ const CardHeader = React.forwardRef(({ className, ...props }, ref) => (
   />
 ));
 CardHeader.displayName = "CardHeader";
-
 const CardTitle = React.forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
