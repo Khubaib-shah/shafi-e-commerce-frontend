@@ -1,51 +1,62 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Switch } from "@/components/ui/switch";
+import { MdDelete } from "react-icons/md";
+import { getItems } from "@/services/apiService";
+import TableSkeleton from "@/components/ui/TableSkeleton";
+import SortableTable from "@/components/SortableTable";
 
-const Reports = ({ bundles }) => {
-  const totalBundles = bundles.length;
-  const totalQuantity = bundles.reduce(
+const Reports = () => {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const data = await getItems();
+        setItems(data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Failed to fetch items:", error);
+      }
+    };
+
+    fetchItems();
+  }, []);
+  const totalBundles = items.length;
+  const totalQuantity = items.reduce(
     (sum, bundle) => sum + Number(bundle.quantity || 0),
     0
   );
-  const totalCost = bundles.reduce(
+  const totalCost = items.reduce(
     (sum, bundle) => sum + Number(bundle.cost || 0),
     0
   );
 
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Reports</h2>
-      <div className="bg-gray-100 p-4 rounded shadow">
+    <div className="w-full">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold ">Reports</h2>
+      </div>
+      <div className="border-b-2 p-4 rounded shadow">
         <p>Total Bundles Received: {totalBundles}</p>
         <p>Total Quantity of Items: {totalQuantity}</p>
-        <p>Total Cost: ${totalCost.toFixed(2)}</p>
+        <p>Total Cost: PKR {Math.round(totalCost.toFixed(2))}</p>
       </div>
       <div className="mt-4">
-        <h3 className="text-lg font-bold mb-2">Detailed Bundles Report</h3>
-        <table className="w-full border-collapse border">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="border p-2">Supplier</th>
-              <th className="border p-2">Quantity</th>
-              <th className="border p-2">Cost</th>
-              <th className="border p-2">Date Received</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bundles.map((bundle, index) => {
-              const date = new Date(bundle.receivedAt).toLocaleDateString(
-                "en-GB"
-              );
-              return (
-                <tr key={index}>
-                  <td className="border p-2">{bundle.supplier}</td>
-                  <td className="border p-2">{bundle.quantity}</td>
-                  <td className="border p-2">PKR{bundle.cost}</td>
-                  <td className="custom-cell">{date}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        {loading ? (
+          <TableSkeleton rows={10} columns={6} />
+        ) : (
+          <SortableTable data={items} title="Detailed Bundles Report" />
+        )}
       </div>
     </div>
   );

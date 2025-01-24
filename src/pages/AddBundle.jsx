@@ -1,100 +1,98 @@
-import axios from "axios";
 import React, { useState } from "react";
-import MyModal from "../Component/MyModal";
-import Button from "../Component/Button";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
+import { createItem } from "@/services/apiService";
 
 const AddBundle = ({ onAddBundle }) => {
-  let [isOpen, setIsOpen] = useState(false);
-
   const [formData, setFormData] = useState({
     supplier: "",
     quantity: "",
     cost: "",
     receivedAt: "",
-    image: "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    onAddBundle(formData);
-
     try {
-      const response = await axios.post(
-        "http://localhost:3333/api/bundles",
-        formData
-      );
-      console.log("Bundle added:", response.data);
-      // Optionally, reset the form or provide feedback to the user
+      const data = await createItem(formData);
+      onAddBundle(data);
+      toast("New Bundle created.");
+      setFormData({
+        supplier: "",
+        quantity: "",
+        cost: "",
+        receivedAt: "",
+      });
     } catch (err) {
       console.error("Failed to add bundle", err);
     }
-    setIsOpen(true);
-    setFormData({
-      supplier: "",
-      quantity: "",
-      cost: "",
-      receivedAt: "",
-      // image: "",
-    });
   };
 
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Add New Bundle</h2>
-      <form onSubmit={handleSubmit} className="p-4 border rounded shadow">
-        <div className="mb-3">
-          <label className="block mb-1">Supplier Name</label>
-          <input
-            type="text"
-            name="supplier"
-            value={formData.supplier}
-            onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <label className="block mb-1">Quantity</label>
-          <input
-            type="number"
-            name="quantity"
-            value={formData.quantity}
-            onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <label className="block mb-1">Cost</label>
-          <input
-            type="number"
-            name="cost"
-            value={formData.cost}
-            onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <label className="block mb-1">Date Received</label>
-          <input
-            type="date"
-            name="receivedAt"
-            value={formData.receivedAt}
-            onChange={handleChange}
-            className="w-full border px-3 py-2 rounded"
-            required
-          />
-        </div>
-        <Button type={"submit"} title={"Add Bundle"} />
-      </form>
-      <MyModal isOpen={isOpen} setIsOpen={setIsOpen} />
-    </div>
+    <Card className="max-w-6xl mx-auto">
+      <CardHeader>
+        <CardTitle>Add New Bundle</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="supplier">Supplier Name</Label>
+            <Input
+              type="text"
+              id="supplier"
+              name="supplier"
+              value={formData.supplier}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="quantity">Quantity</Label>
+            <Input
+              type="number"
+              id="quantity"
+              name="quantity"
+              value={formData.quantity}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="cost">Cost</Label>
+            <Input
+              type="number"
+              id="cost"
+              name="cost"
+              value={formData.cost}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="receivedAt">Date Received</Label>
+            <Input
+              type="date"
+              id="receivedAt"
+              name="receivedAt"
+              value={formData.receivedAt}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <Button type="submit" className="w-full">
+            Add Bundle
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 
