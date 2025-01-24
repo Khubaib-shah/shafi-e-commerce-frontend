@@ -1,11 +1,12 @@
 import axios from "axios";
 import API_BASE_URL from "../config/apiConfig";
 
+console.log(API_BASE_URL);
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
-    Accept: "application/json", // Ensure the server knows you expect JSON
+    Accept: "application/json",
   },
 });
 
