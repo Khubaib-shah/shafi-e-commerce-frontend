@@ -42,18 +42,13 @@ const AddBundle = () => {
     try {
       await createItem(formData);
       toast.success("New Bundle created.");
-      if (
-        window.confirm(
-          "Form submitted successfully. Do you want to reset the form?"
-        )
-      ) {
-        setFormData({
-          supplier: "",
-          quantity: "",
-          cost: "",
-          receivedAt: "",
-        });
-      }
+
+      setFormData({
+        supplier: "",
+        quantity: "",
+        cost: "",
+        receivedAt: "",
+      });
     } catch (err) {
       toast.error("Failed to add bundle. Please try again.");
       console.error("Failed to add bundle", err);
