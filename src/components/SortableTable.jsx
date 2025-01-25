@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import useSortableData from "@/hooks/useSortableData";
 import {
   Table,
@@ -9,17 +9,35 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Switch } from "./ui/switch";
-import { MdDelete } from "react-icons/md";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "./ui/Button";
+import {
+  ContextMenu,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "./ui/context-menu";
+import { ContextMenuContent } from "@radix-ui/react-context-menu";
+import { Link } from "react-router-dom";
+import { DeleteById } from "@/services/apiService";
 
 const SortableTable = ({ data, title }) => {
   const { items, requestSort, sortConfig } = useSortableData(data);
+  const [bundeId, setBundeId] = useState();
+  const [open, setOpen] = useState(false);
 
   const getClassNamesFor = (name) => {
     if (!sortConfig) {
@@ -27,7 +45,29 @@ const SortableTable = ({ data, title }) => {
     }
     return sortConfig.key === name ? sortConfig.direction : undefined;
   };
+  const handleConfirm = (id) => {
+    setBundeId(id);
+    setOpen(false);
+    console.log("Confirmed!");
+    location.reload();
+  };
+  useEffect(() => {
+    const HandleDelete = async () => {
+      try {
+        if (bundeId) {
+          await DeleteById(bundeId);
+          console.log(`Deleted bundle with ID: ${bundeId}`);
+        }
+      } catch (error) {
+        console.error("Error deleting bundle:", error);
+      }
+    };
 
+    if (bundeId) {
+      DeleteById(bundeId);
+      HandleDelete();
+    }
+  }, [bundeId]);
   return (
     <>
       <div className="flex items-center justify-between">
@@ -76,7 +116,7 @@ const SortableTable = ({ data, title }) => {
             <TableHead>Quantity</TableHead>
             <TableHead>Cost</TableHead>
             <TableHead>Date Received</TableHead>
-            <TableHead>Delete</TableHead>
+            <TableHead>Action</TableHead>
             <TableHead>Status</TableHead>
           </TableRow>
         </TableHeader>
@@ -92,18 +132,39 @@ const SortableTable = ({ data, title }) => {
                 <TableCell>{bundle.cost}</TableCell>
                 <TableCell>{date}</TableCell>
                 <TableCell>
-                  <button>
-                    <MdDelete />
-                  </button>
+                  <Dialog open={open} onOpenChange={setOpen}>
+                    <ContextMenu>
+                      <ContextMenuTrigger>Right click</ContextMenuTrigger>
+                      <ContextMenuContent>
+                        <Link to={`/bundle/${bundle._id}`}>
+                          <ContextMenuItem>Open</ContextMenuItem>
+                        </Link>
+                        <ContextMenuItem>Edit</ContextMenuItem>
+                        <ContextMenuItem>Download</ContextMenuItem>
+                        <DialogTrigger asChild>
+                          <ContextMenuItem>
+                            <span>Delete</span>
+                          </ContextMenuItem>
+                        </DialogTrigger>
+                      </ContextMenuContent>
+                    </ContextMenu>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Are you absolutely sure?</DialogTitle>
+                        <DialogDescription>
+                          This action cannot be undone. Are you sure you want to
+                          permanently delete this file from our servers?
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <Button onClick={() => handleConfirm(bundle._id)}>
+                          Confirm
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </TableCell>
-                <TableCell>
-                  <Switch
-                    checked={bundle.status === "active"}
-                    onCheckedChange={(checked) =>
-                      handleStatusChange(bundle.id, checked)
-                    }
-                  />
-                </TableCell>
+                <TableCell>{bundle.status}</TableCell>
               </TableRow>
             );
           })}

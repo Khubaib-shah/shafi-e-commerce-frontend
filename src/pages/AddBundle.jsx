@@ -14,7 +14,6 @@ const AddBundle = () => {
     receivedAt: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isYes, setIsYes] = useState();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
